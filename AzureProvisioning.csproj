@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AzureFunctionsVersion>v4</AzureFunctionsVersion>
+    <_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
+    <UserSecretsId>cba8d5d1-7d22-4205-9969-1191a69aa67d</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="TestLinks.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.6.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Graph" Version="4.25.0" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.1.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Code\host.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Code\local.settings.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+</Project>
