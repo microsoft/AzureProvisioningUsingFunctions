@@ -6,6 +6,11 @@
     <UserSecretsId>cba8d5d1-7d22-4205-9969-1191a69aa67d</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Code\Properties\**" />
+    <EmbeddedResource Remove="Code\Properties\**" />
+    <None Remove="Code\Properties\**" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="TestLinks.txt" />
   </ItemGroup>
   <ItemGroup>
