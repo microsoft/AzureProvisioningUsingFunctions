@@ -1,14 +1,11 @@
-# Project
+# Azure Provisioning Functions
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+The code provided by this project can be used to create Azure Functions to provision quickly, with a simple POST call users (and soon other resources) to Azure AD.
 
-As the maintainer of this project, please make a few updates:
+At the moment the following 2 Functions are provided:
+- CreateUser: Create a new Azure AD user
+- UpdateUserProperty: Modify an Azure AD user attribute
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
 
 ## Contributing
 
