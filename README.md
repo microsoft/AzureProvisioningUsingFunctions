@@ -10,7 +10,9 @@ At the moment the following 2 Functions are provided:
 	- InitialPassword (Optional) - This will be the password assigned to the user for first login. If not provided, a random password will be assigned and returned by the function.
 
 - UpdateUserProperty: Modify an Azure AD user attribute
-
+	- Identity (Mandatory) - This will be the Identity (using UserPrincipalName) of the user you want to modify.
+	- Property (Mandatory) - This will be the Property (Attribute) of the user that will be modified.
+	- Value (Mandatory) - This will be the Value of Property that will be modified.
 
 
 ## Setup
