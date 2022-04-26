@@ -108,7 +108,6 @@ namespace AzureProvisioning.Code
 
 
 
-
     public static class UpdateUserProperty
     {
         [FunctionName("UpdateUserProperty")]
@@ -178,6 +177,70 @@ namespace AzureProvisioning.Code
             return new OkObjectResult(responseMessage);
         }
     }
+
+
+    public static class DeleteUser
+    {
+        [FunctionName("DeleteUser")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+            log.LogInformation("C# HTTP trigger function processed a request.");
+
+            string Identity = req.Query["UserPrincipalName"];
+            
+
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            dynamic data = JsonConvert.DeserializeObject(requestBody);
+            Identity = Identity ?? data?.Identity;
+            
+
+            string responseMessage;
+            if (Identity.IsNullOrEmpty())
+            {
+                responseMessage = "Missing Parameter.";
+                return new BadRequestObjectResult(responseMessage);
+            }
+
+            var scopes = new[] { "https://graph.microsoft.com/.default" };
+
+            var builder = new ConfigurationBuilder()
+                    .SetBasePath(Environment.CurrentDirectory)
+                    .AddJsonFile("local.settings.json", true)
+                    .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+                    .AddEnvironmentVariables()
+                    .Build();
+
+
+            var tenantId = builder.GetValue<string>("_secret:tenantId");
+            var clientId = builder.GetValue<string>("_secret:clientId");
+            var clientSecret = builder.GetValue<string>("_secret:clientSecret");
+
+            // using Azure.Identity;
+            var options = new TokenCredentialOptions
+            {
+                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
+            };
+
+            var clientSecretCredential = new ClientSecretCredential(
+                tenantId, clientId, clientSecret, options);
+
+            var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
+
+
+            await graphClient.Users[Identity]
+                .Request()
+                .DeleteAsync();
+
+            responseMessage = "User deleted successfully.";
+            
+
+            return new OkObjectResult(responseMessage);
+        }
+    }
+
+
 
 
 
