@@ -3,8 +3,19 @@
 The code provided by this project can be used to create Azure Functions to provision quickly, with a simple POST call users (and soon other resources) to Azure AD.
 
 At the moment the following 2 Functions are provided:
-- CreateUser: Create a new Azure AD user
+- CreateUser: Create a new Azure AD user with a password and ForceChangePasswordNextSignIn property to True. The function takes the following parameter:
+	- DisplayName (Mandatory) - This will be the DisplayName assigned to the user.
+	- MailNickname (Mandatory) - This will be the MailNickName assigned to the user.
+	- UserPrincipalName (Mandatory) - This will be the UserPrincipalName assigned to the user. The assigned domain MUST be one of the registered domain in the tenant.
+	- InitialPassword (Optional) - This will be the password assigned to the user for first login. If not provided, a random password will be assigned and returned by the function.
+
 - UpdateUserProperty: Modify an Azure AD user attribute
+
+
+
+## Setup
+### Create App Registration
+
 
 
 ## Contributing

@@ -95,7 +95,12 @@ namespace AzureProvisioning.Code
                 .Request()
                 .AddAsync(user);
 
-            responseMessage = "User created successfully.";
+            if (InitialPassword.IsNullOrEmpty()) {
+                responseMessage = "User created successfully. Generated password is: " + InitialPassword;
+            }
+            else { 
+                responseMessage = "User created successfully.";
+            }
 
             return new OkObjectResult(responseMessage);
         }
