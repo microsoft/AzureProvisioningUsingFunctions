@@ -6,3 +6,6 @@
 /bin
 /obj
 /TestLinks.txt
+/Properties/PublishProfiles
+/AzureProvisioning.csproj.user
+/Properties/ServiceDependencies/ProvisioningFunctions - Zip Deploy

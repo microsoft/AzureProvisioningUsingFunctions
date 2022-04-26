@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration.UserSecrets;
 using System.Reflection;
 
 
+
 namespace AzureProvisioning.Code
 {
     public static class CreateUser
@@ -189,12 +190,12 @@ namespace AzureProvisioning.Code
             log.LogInformation("C# HTTP trigger function processed a request.");
 
             string Identity = req.Query["UserPrincipalName"];
-            
+
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
             Identity = Identity ?? data?.Identity;
-            
+
 
             string responseMessage;
             if (Identity.IsNullOrEmpty())
@@ -234,7 +235,7 @@ namespace AzureProvisioning.Code
                 .DeleteAsync();
 
             responseMessage = "User deleted successfully.";
-            
+
 
             return new OkObjectResult(responseMessage);
         }
