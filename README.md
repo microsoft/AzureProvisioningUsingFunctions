@@ -20,7 +20,7 @@ At the moment the following 3 Functions are provided:
 
 
 - DeleteUser: Delete a Azure AD user identified by the UserPrincipalName. The function takes the following parameter:
-	- **Identity (Mandatory)** - This will be the Identity (using UserPrincipalName) of the user you want to delete.
+	- **UserPrincipalName (Mandatory)** - This will be the Identity (using UserPrincipalName) of the user you want to delete.
 
 
 

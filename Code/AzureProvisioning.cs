@@ -136,9 +136,6 @@ namespace AzureProvisioning.Code
                 return new BadRequestObjectResult(responseMessage);
             }
 
-
-
-
             var scopes = new[] { "https://graph.microsoft.com/.default" };
 
             var builder = new ConfigurationBuilder()
@@ -189,16 +186,16 @@ namespace AzureProvisioning.Code
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            string Identity = req.Query["UserPrincipalName"];
+            string UserPrincipalName = req.Query["UserPrincipalName"];
 
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
-            Identity = Identity ?? data?.Identity;
+            UserPrincipalName = UserPrincipalName ?? data?.Identity;
 
 
             string responseMessage;
-            if (Identity.IsNullOrEmpty())
+            if (UserPrincipalName.IsNullOrEmpty())
             {
                 responseMessage = "Missing Parameter.";
                 return new BadRequestObjectResult(responseMessage);
@@ -230,7 +227,7 @@ namespace AzureProvisioning.Code
             var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
 
 
-            await graphClient.Users[Identity]
+            await graphClient.Users[UserPrincipalName]
                 .Request()
                 .DeleteAsync();
 

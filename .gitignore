@@ -9,3 +9,6 @@
 /Properties/PublishProfiles
 /AzureProvisioning.csproj.user
 /Properties/ServiceDependencies/ProvisioningFunctions - Zip Deploy
+/local.settings.json
+/host.json
+/Properties
