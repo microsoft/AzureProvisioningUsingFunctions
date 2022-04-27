@@ -28,12 +28,50 @@ At the moment the following 3 Functions are provided:
 
 ## Setup
 ### Create App Registration
+Registering your application establishes a trust relationship between your app and the Microsoft identity platform. The trust is unidirectional: your app trusts the Microsoft identity platform, and not the other way around.
+
+Follow these steps to create the app registration:
+	1. Sign in to the Azure portal.
+	2. Search for and select Azure Active Directory.
+	3. Under Manage, select App registrations > New registration.
+	4. Enter a display Name for your application. Users of your application might see the display name when they use the app, for example during sign-in. 
+	5. Note the automatically generated Application (client) ID.
+	6. Don't enter anything for Redirect URI.
+	7. Select Register to complete the initial app registration.
+	8. Select from left menu of the app created Certificates & secrets > Client secrets > New client secret.
+	9. Add a description for your client secret.
+	10. Select an expiration for the secret or specify a custom lifetime.
+	11. Select Add.
+	12. Record the secret's value for use in your client application code. This secret value is never displayed again after you leave this page.
 
 
+### Authorize app access to Azure Active Directory
+	1. Sign in to the Azure portal.
+	2. Search for and select Azure Active Directory.
+	3. Select Roles & Administrators
+	4. Search for and select the role assignment you to assign to the app. For example, Global Administrator.
+	5. Click on Add Assignments
+	6. Search the name of the app create previously 
+	7. Click Add
 
+### Create Azure Function environment
+	1. From the Azure portal menu or the Home page, select Create a resource.
+	2. In the New page, select Compute > Function App.
+	3. On the Basics page, complete the function app settings.
+	4. on others pages, complete the function app settings.
+	5. Select Review + create to review the app configuration selections.
+	6. On the Review + create page, review your settings, and then select Create to provision and deploy the function app.
+	7. Select the Notifications icon in the upper-right corner of the portal and watch for the Deployment succeeded message.
+	8. Select Go to resource to view your new function app.
+	9. Select the Configuration page from the left menu of the create app.
+	10. Select New Application setting and add the following entries:
+		|Name|Value| 
+		|_secret:clientId|<Enter the ClientID created previously>|
+		|_secret:clientSecret|<Enter the clientSecret created previously>|
+		|_secret:tenantId|<Enter the tenantId>|
 
-
-
+### Deploy Azure Functions
+Deploy Azure Functions for example using Visual Studio.
 
 
 ## Contributing
