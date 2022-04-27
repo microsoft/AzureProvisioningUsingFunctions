@@ -69,9 +69,9 @@ Follow these steps to create the app registration:
 
 |Name                    |Value                                       |
 | :--------------------: | :----------------------------------------: |
-|_secret:clientId        |<Enter the ClientID created previously>     |
-|_secret:clientSecret    |<Enter the clientSecret created previously> |
-|_secret:tenantId        |<Enter the tenantId>                        |
+|_secret:clientId        | Enter the ClientID created previously      |
+|_secret:clientSecret    | Enter the clientSecret created previously  |
+|_secret:tenantId        | Enter the tenantId                         |
 
 ### Deploy Azure Functions
 Deploy Azure Functions for example using Visual Studio.
