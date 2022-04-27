@@ -26,11 +26,15 @@ At the moment the following 3 Functions are provided:
 
 
 
-## Setup
+## Setup & Prerequisites
+Using the steps below you will be able to create all prerequisites and resources required by the solution.
+
+
 ### Create App Registration
 Registering your application establishes a trust relationship between your app and the Microsoft identity platform. The trust is unidirectional: your app trusts the Microsoft identity platform, and not the other way around.
 
 Follow these steps to create the app registration:
+
 	1. Sign in to the Azure portal.
 	2. Search for and select Azure Active Directory.
 	3. Under Manage, select App registrations > New registration.
@@ -64,11 +68,11 @@ Follow these steps to create the app registration:
 	7. Select the Notifications icon in the upper-right corner of the portal and watch for the Deployment succeeded message.
 	8. Select Go to resource to view your new function app.
 	9. Select the Configuration page from the left menu of the create app.
-	10. Select New Application setting and add the following entries:
+	10. Select New Application setting and add the entries reported in the table below.
 
 
 |Name                    |Value                                       |
-| :--------------------: | :----------------------------------------: |
+| :--------------------- | :----------------------------------------- |
 |_secret:clientId        | Enter the ClientID created previously      |
 |_secret:clientSecret    | Enter the clientSecret created previously  |
 |_secret:tenantId        | Enter the tenantId                         |
