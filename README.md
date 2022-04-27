@@ -49,14 +49,15 @@ Follow these steps to create the app registration:
 	12. Record the secret's value for use in your client application code. This secret value is never displayed again after you leave this page.
 
 
+
+
 ### Authorize app access to Azure Active Directory
-	1. Sign in to the Azure portal.
-	2. Search for and select Azure Active Directory.
-	3. Select Roles & Administrators
-	4. Search for and select the role assignment you to assign to the app. For example, Global Administrator.
-	5. Click on Add Assignments
-	6. Search the name of the app create previously 
-	7. Click Add
+
+	1. From the created app, select from left menu of the app created API Authorization.
+	2. Add Graph Authorization: User.ReadWrite.All, LicenseAssignment.ReadWrite.All
+	3. Provide Admin consent for the authorizations
+
+
 
 ### Create Azure Function environment
 	1. From the Azure portal menu or the Home page, select Create a resource.
