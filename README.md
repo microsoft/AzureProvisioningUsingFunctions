@@ -65,10 +65,11 @@ Follow these steps to create the app registration:
 	8. Select Go to resource to view your new function app.
 	9. Select the Configuration page from the left menu of the create app.
 	10. Select New Application setting and add the following entries:
-		|Name|Value| 
-		|_secret:clientId|<Enter the ClientID created previously>|
-		|_secret:clientSecret|<Enter the clientSecret created previously>|
-		|_secret:tenantId|<Enter the tenantId>|
+		|Name                    |Value                                       |
+		| :--------------------: | :----------------------------------------: |
+		|_secret:clientId        |<Enter the ClientID created previously>     |
+		|_secret:clientSecret    |<Enter the clientSecret created previously> |
+		|_secret:tenantId        |<Enter the tenantId>                        |
 
 ### Deploy Azure Functions
 Deploy Azure Functions for example using Visual Studio.
