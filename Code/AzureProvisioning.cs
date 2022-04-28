@@ -290,6 +290,7 @@ namespace AzureProvisioning.Code
 
             User userToAdd = await graphClient.Users[UserPrincipalName].Request().GetAsync();
             await graphClient.Groups[GroupId].Members.References.Request().AddAsync(userToAdd);
+            
 
             responseMessage = "User added to the group successfully.";
 
@@ -298,6 +299,71 @@ namespace AzureProvisioning.Code
         }
     }
 
+
+    public static class RemoveUserFromGroup
+    {
+        [FunctionName("RemoveUserFromGroup")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+            log.LogInformation("C# HTTP trigger function processed a request.");
+
+            string UserPrincipalName = req.Query["UserPrincipalName"];
+            string GroupId = req.Query["GroupId"];
+
+
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            dynamic data = JsonConvert.DeserializeObject(requestBody);
+            UserPrincipalName = UserPrincipalName ?? data?.UserPrincipalName;
+            GroupId = GroupId ?? data?.GroupId;
+
+            string responseMessage;
+            if (UserPrincipalName.IsNullOrEmpty() || GroupId.IsNullOrEmpty())
+            {
+                responseMessage = "Missing Parameter.";
+                return new BadRequestObjectResult(responseMessage);
+            }
+
+            var scopes = new[] { "https://graph.microsoft.com/.default" };
+
+            var builder = new ConfigurationBuilder()
+                    .SetBasePath(Environment.CurrentDirectory)
+                    .AddJsonFile("local.settings.json", true)
+                    .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+                    .AddEnvironmentVariables()
+                    .Build();
+
+
+            var tenantId = builder.GetValue<string>("_secret:tenantId");
+            var clientId = builder.GetValue<string>("_secret:clientId");
+            var clientSecret = builder.GetValue<string>("_secret:clientSecret");
+
+            // using Azure.Identity;
+            var options = new TokenCredentialOptions
+            {
+                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
+            };
+
+            var clientSecretCredential = new ClientSecretCredential(
+                tenantId, clientId, clientSecret, options);
+
+            var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
+
+
+            User userToAdd = await graphClient.Users[UserPrincipalName].Request().GetAsync();
+            
+            await graphClient.Groups[GroupId].Members[userToAdd.Id].Reference
+                .Request()
+                .DeleteAsync();
+
+
+            responseMessage = "User removed from the group successfully.";
+
+
+            return new OkObjectResult(responseMessage);
+        }
+    }
 
 
     public static class CreateGroup

@@ -1,6 +1,7 @@
-# Azure Provisioning Functions
+# Azure Active Directory Provisioning with Azure Functions
 
-The code provided by this project can be used to create Azure Functions to provision quickly, with a simple POST call users (and soon other resources) to Azure AD.
+The code provided by this project can be used to create Azure Functions to provision quickly, with a simple GET or POST call users and groups to Azure AD and execute management activities on the resources.
+
 
 The following Functions are provided:
 
@@ -24,11 +25,13 @@ The following Functions are provided:
 	- **DisplayName (Mandatory)** - The DisplayName to assign to the group.
 	- **MailNickname (Mandatory)** - The MailNickname to assign to the group.
 
-- **AddUserToGroup**: Delete a Azure AD user identified by the UserPrincipalName. The function takes the following parameter:
+- **AddUserToGroup**: Add an Azure AD user identified by the UserPrincipalName to a group. The function takes the following parameter:
 	- **UserPrincipalName (Mandatory)** - This will be the Identity (using UserPrincipalName) of the user you want to add to the group.
 	- **GroupId (Mandatory)** - This will be the GroupId of the group where the user will be added.
 
-
+- **RemoveUserFromGroup**: Remove an Azure AD user identified by the UserPrincipalName to a group. The function takes the following parameter:
+	- **UserPrincipalName (Mandatory)** - This will be the Identity (using UserPrincipalName) of the user you want to add to the group.
+	- **GroupId (Mandatory)** - This will be the GroupId of the group where the user will be added.
 
 ## Setup & Prerequisites
 Using the steps below you will be able to create all prerequisites and resources required by the solution.
