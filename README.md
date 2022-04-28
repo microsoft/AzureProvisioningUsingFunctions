@@ -2,27 +2,31 @@
 
 The code provided by this project can be used to create Azure Functions to provision quickly, with a simple POST call users (and soon other resources) to Azure AD.
 
-At the moment the following 3 Functions are provided:
+The following Functions are provided:
 
-- CreateUser: Create a new Azure AD user with a password and ForceChangePasswordNextSignIn property to True. The function takes the following parameter:
+- **CreateUser**: Create a new Azure AD user with a password and ForceChangePasswordNextSignIn property to True. The function takes the following parameter:
 	- **DisplayName (Mandatory)** - This will be the DisplayName assigned to the user.
 	- **MailNickname (Mandatory)** - This will be the MailNickName assigned to the user.
 	- **UserPrincipalName (Mandatory)** - This will be the UserPrincipalName assigned to the user. The assigned domain MUST be one of the registered domain in the tenant.
 	- **InitialPassword (Optional)** - This will be the password assigned to the user for first login. If not provided, a random password will be assigned and returned by the function.
 
-
-
-- UpdateUserProperty: Modify an Azure AD user attribute
+- **UpdateUserProperty**: Modify an Azure AD user attribute
 	- **Identity (Mandatory)** - This will be the Identity (using UserPrincipalName) of the user you want to modify.
 	- **Property (Mandatory)** - This will be the Property (Attribute) of the user that will be modified.
 	- **Value (Mandatory)** - This will be the Value of Property that will be modified.
 
-
-
-- DeleteUser: Delete a Azure AD user identified by the UserPrincipalName. The function takes the following parameter:
+- **DeleteUser**: Delete a Azure AD user identified by the UserPrincipalName. The function takes the following parameter:
 	- **UserPrincipalName (Mandatory)** - This will be the Identity (using UserPrincipalName) of the user you want to delete.
 
+- **CreateGroup**: Create an Azure AD group of specified type. The function takes the following parameter:
+	- **GroupType (Mandatory)** - The GroupType can be Unified (SecurityEnabled=False,MailEnabled=True),UnifiedSecurity (SecurityEnabled=True,MailEnabled=True) or Security (SecurityEnabled=True,MailEnabled=False).
+	- **GroupName (Mandatory)** - The name to assign to the group.
+	- **DisplayName (Mandatory)** - The DisplayName to assign to the group.
+	- **MailNickname (Mandatory)** - The MailNickname to assign to the group.
 
+- **AddUserToGroup**: Delete a Azure AD user identified by the UserPrincipalName. The function takes the following parameter:
+	- **UserPrincipalName (Mandatory)** - This will be the Identity (using UserPrincipalName) of the user you want to add to the group.
+	- **GroupId (Mandatory)** - This will be the GroupId of the group where the user will be added.
 
 
 
@@ -54,7 +58,7 @@ Follow these steps to create the app registration:
 ### Authorize app access to Azure Active Directory
 
 	1. From the created app, select from left menu of the app created API Authorization.
-	2. Add Graph Authorization: User.ReadWrite.All, LicenseAssignment.ReadWrite.All
+	2. Add Graph Authorization: User.ReadWrite.All, LicenseAssignment.ReadWrite.All, Group.ReadWrite.All, Group.Create
 	3. Provide Admin consent for the authorizations
 
 

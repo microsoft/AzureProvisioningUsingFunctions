@@ -13,8 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using System.Reflection;
-
-
+using System.Collections.Generic;
 
 namespace AzureProvisioning.Code
 {
@@ -191,7 +190,7 @@ namespace AzureProvisioning.Code
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
-            UserPrincipalName = UserPrincipalName ?? data?.Identity;
+            UserPrincipalName = UserPrincipalName ?? data?.UserPrincipalName;
 
 
             string responseMessage;
@@ -238,8 +237,215 @@ namespace AzureProvisioning.Code
         }
     }
 
+    public static class AddUserToGroup
+    {
+        [FunctionName("AddUserToGroup")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+            log.LogInformation("C# HTTP trigger function processed a request.");
+
+            string UserPrincipalName = req.Query["UserPrincipalName"];
+            string GroupId = req.Query["GroupId"];
+
+
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            dynamic data = JsonConvert.DeserializeObject(requestBody);
+            UserPrincipalName = UserPrincipalName ?? data?.UserPrincipalName;
+            GroupId = GroupId ?? data?.GroupId;
+
+            string responseMessage;
+            if (UserPrincipalName.IsNullOrEmpty() || GroupId.IsNullOrEmpty())
+            {
+                responseMessage = "Missing Parameter.";
+                return new BadRequestObjectResult(responseMessage);
+            }
+
+            var scopes = new[] { "https://graph.microsoft.com/.default" };
+
+            var builder = new ConfigurationBuilder()
+                    .SetBasePath(Environment.CurrentDirectory)
+                    .AddJsonFile("local.settings.json", true)
+                    .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+                    .AddEnvironmentVariables()
+                    .Build();
+
+
+            var tenantId = builder.GetValue<string>("_secret:tenantId");
+            var clientId = builder.GetValue<string>("_secret:clientId");
+            var clientSecret = builder.GetValue<string>("_secret:clientSecret");
+
+            // using Azure.Identity;
+            var options = new TokenCredentialOptions
+            {
+                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
+            };
+
+            var clientSecretCredential = new ClientSecretCredential(
+                tenantId, clientId, clientSecret, options);
+
+            var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
+
+
+            User userToAdd = await graphClient.Users[UserPrincipalName].Request().GetAsync();
+            await graphClient.Groups[GroupId].Members.References.Request().AddAsync(userToAdd);
+
+            responseMessage = "User added to the group successfully.";
+
+
+            return new OkObjectResult(responseMessage);
+        }
+    }
 
 
 
+    public static class CreateGroup
+    {
+        [FunctionName("CreateGroup")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+            log.LogInformation("C# HTTP trigger function processed a request.");
+
+            string GroupType = req.Query["GroupType"];
+            string GroupName = req.Query["GroupName"];
+            string DisplayName = req.Query["DisplayName"];
+            string MailNickname = req.Query["MailNickname"];
+
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            dynamic data = JsonConvert.DeserializeObject(requestBody);
+            GroupType = GroupType ?? data?.GroupType;
+            GroupName = GroupName ?? data?.GroupName;
+            DisplayName = DisplayName ?? data?.DisplayName;
+            MailNickname = MailNickname ?? data?.MailNickname;
+
+            string responseMessage;
+            if (GroupType.IsNullOrEmpty() || GroupName.IsNullOrEmpty() || DisplayName.IsNullOrEmpty() || MailNickname.IsNullOrEmpty())
+            {
+                responseMessage = "Missing Parameter.";
+                return new BadRequestObjectResult(responseMessage);
+            }
+
+            var scopes = new[] { "https://graph.microsoft.com/.default" };
+
+            var builder = new ConfigurationBuilder()
+                    .SetBasePath(Environment.CurrentDirectory)
+                    .AddJsonFile("local.settings.json", true)
+                    .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+                    .AddEnvironmentVariables()
+                    .Build();
+
+
+            var tenantId = builder.GetValue<string>("_secret:tenantId");
+            var clientId = builder.GetValue<string>("_secret:clientId");
+            var clientSecret = builder.GetValue<string>("_secret:clientSecret");
+
+            // using Azure.Identity;
+            var options = new TokenCredentialOptions
+            {
+                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
+            };
+
+            var clientSecretCredential = new ClientSecretCredential(
+                tenantId, clientId, clientSecret, options);
+
+            var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
+            Group group;
+
+
+            switch (GroupType)
+            {
+                case "Unified": // OK
+                    group = new Group
+                    {
+                        DisplayName = DisplayName,
+                        GroupTypes = new List<String>()
+                        {
+                            "Unified"
+                        },
+                        MailEnabled = true,
+                        MailNickname = MailNickname,
+                        SecurityEnabled = false
+                    };
+                    break;
+
+
+                case "UnifiedSecurity": //OK
+                    group = new Group
+                    {
+                        DisplayName = DisplayName,
+                        GroupTypes = new List<String>()
+                        {
+                            "Unified"
+                        },
+                        MailEnabled = true,
+                        MailNickname = MailNickname,
+                        SecurityEnabled = true
+                    };
+                    break;
+
+                case "Security": // OK
+                    group = new Group
+                    {
+                        DisplayName = DisplayName,
+                        MailEnabled = false,
+                        MailNickname = MailNickname,
+                        SecurityEnabled = true
+                    };
+                    break;
+/*
+                case "MailEnabledSecurity": //NOK
+                    group = new Group
+                    {
+                        DisplayName = DisplayName,
+                        MailEnabled = true,
+                        MailNickname = MailNickname,
+                        SecurityEnabled = true
+                    };
+                    break;
+
+                case "Distribution": //NOK
+                    group = new Group
+                    {
+                        DisplayName = DisplayName,
+                        MailEnabled = true,
+                        MailNickname = MailNickname,
+                        SecurityEnabled = false
+                    };
+                    break;
+
+                case "DynamicUnified": //NOK missing membershipRule
+                    group = new Group
+                    {
+                        DisplayName = DisplayName,
+                        GroupTypes = new List<String>()
+                        {
+                            "Unified",
+                            "DynamicMembership"
+                        },
+                        MailEnabled = true,
+                        MailNickname = MailNickname,
+                        SecurityEnabled = false
+                    };
+                    break;
+*/
+                default:
+                    responseMessage = "GroupType not supported.";
+                    return new BadRequestObjectResult(responseMessage);
+
+            }
+
+            await graphClient.Groups
+                .Request()
+                .AddAsync(group);
+
+            responseMessage = "Group created successfully.";
+
+
+            return new OkObjectResult(responseMessage);
+        }
+    }
 
 }
