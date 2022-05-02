@@ -1,5 +1,8 @@
 # Azure Active Directory Provisioning with Azure Functions
 
+
+[![.NET](https://github.com/microsoft/AzureProvisioningUsingFunctions/actions/workflows/dotnet.yml/badge.svg)](https://github.com/microsoft/AzureProvisioningUsingFunctions/actions/workflows/dotnet.yml)
+
 The code provided by this project can be used to create Azure Functions to provision quickly, with a simple GET or POST call users and groups to Azure AD and execute management activities on the resources.
 
 

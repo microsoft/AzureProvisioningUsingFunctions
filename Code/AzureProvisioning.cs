@@ -106,8 +106,6 @@ namespace AzureProvisioning.Code
         }
     }
 
-
-
     public static class UpdateUserProperty
     {
         [FunctionName("UpdateUserProperty")]
@@ -174,7 +172,6 @@ namespace AzureProvisioning.Code
             return new OkObjectResult(responseMessage);
         }
     }
-
 
     public static class DeleteUser
     {
