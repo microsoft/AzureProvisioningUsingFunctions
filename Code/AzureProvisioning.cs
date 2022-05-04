@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AzureProvisioning.Code
 {
@@ -24,7 +25,7 @@ namespace AzureProvisioning.Code
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation("CreateUser function triggered with HTTP trigger.");
 
             string DisplayName = req.Query["DisplayName"];
             string MailNickname = req.Query["MailNickname"];
@@ -102,7 +103,9 @@ namespace AzureProvisioning.Code
                 responseMessage = "User created successfully.";
             }
 
+            log.LogInformation("CreateUser function processing finished.");
             return new OkObjectResult(responseMessage);
+
         }
     }
 
@@ -113,7 +116,8 @@ namespace AzureProvisioning.Code
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            
+            log.LogInformation("UpdateUserProperty function triggered with HTTP trigger.");
 
             string Identity = req.Query["Identity"];
             string Property = req.Query["Property"];
@@ -168,7 +172,7 @@ namespace AzureProvisioning.Code
                 .UpdateAsync(user);
 
             responseMessage = "User modified successfully.";
-
+            log.LogInformation("UpdateUserProperty function processing finished.");
             return new OkObjectResult(responseMessage);
         }
     }
@@ -180,7 +184,8 @@ namespace AzureProvisioning.Code
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            
+            log.LogInformation("DeleteUser function triggered with HTTP trigger.");
 
             string UserPrincipalName = req.Query["UserPrincipalName"];
 
@@ -229,7 +234,7 @@ namespace AzureProvisioning.Code
 
             responseMessage = "User deleted successfully.";
 
-
+            log.LogInformation("DeleteUser function processing finished.");
             return new OkObjectResult(responseMessage);
         }
     }
@@ -241,7 +246,7 @@ namespace AzureProvisioning.Code
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation("AddUserToGroup function triggered with HTTP trigger.");
 
             string UserPrincipalName = req.Query["UserPrincipalName"];
             string GroupId = req.Query["GroupId"];
@@ -291,7 +296,7 @@ namespace AzureProvisioning.Code
 
             responseMessage = "User added to the group successfully.";
 
-
+            log.LogInformation("AddUserToGroup function processing finished.");
             return new OkObjectResult(responseMessage);
         }
     }
@@ -304,7 +309,8 @@ namespace AzureProvisioning.Code
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            
+            log.LogInformation("RemoveUserFromGroup function triggered with HTTP trigger.");
 
             string UserPrincipalName = req.Query["UserPrincipalName"];
             string GroupId = req.Query["GroupId"];
@@ -356,7 +362,7 @@ namespace AzureProvisioning.Code
 
 
             responseMessage = "User removed from the group successfully.";
-
+            log.LogInformation("RemoveUserFromGroup function processing finished.");
 
             return new OkObjectResult(responseMessage);
         }
@@ -370,7 +376,7 @@ namespace AzureProvisioning.Code
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation("CreateGroup function triggered with HTTP trigger.");
 
             string GroupType = req.Query["GroupType"];
             string GroupName = req.Query["GroupName"];
@@ -506,9 +512,83 @@ namespace AzureProvisioning.Code
 
             responseMessage = "Group created successfully.";
 
-
+            log.LogInformation("CreateGroup function processing finished.");
             return new OkObjectResult(responseMessage);
         }
     }
+
+
+    public static class UpdateGroupProperty
+    {
+        [FunctionName("UpdateGroupProperty")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+
+            log.LogInformation("UpdateGroupProperty function triggered with HTTP trigger.");
+
+            string GroupId = req.Query["GroupId"];
+            string Property = req.Query["Property"];
+            string Value = req.Query["Value"];
+
+
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            dynamic data = JsonConvert.DeserializeObject(requestBody);
+            Property = Property ?? data?.Property;
+            Value = Value ?? data?.Value;
+            GroupId = GroupId ?? data?.GroupId;
+
+            string responseMessage;
+            if (Property.IsNullOrEmpty() || Value.IsNullOrEmpty() || GroupId.IsNullOrEmpty())
+            {
+                responseMessage = "Missing Parameter.";
+                return new BadRequestObjectResult(responseMessage);
+            }
+
+            var scopes = new[] { "https://graph.microsoft.com/.default" };
+
+            var builder = new ConfigurationBuilder()
+                    .SetBasePath(Environment.CurrentDirectory)
+                    .AddJsonFile("local.settings.json", true)
+                    .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+                    .AddEnvironmentVariables()
+                    .Build();
+
+
+            var tenantId = builder.GetValue<string>("_secret:tenantId");
+            var clientId = builder.GetValue<string>("_secret:clientId");
+            var clientSecret = builder.GetValue<string>("_secret:clientSecret");
+
+            // using Azure.Identity;
+            var options = new TokenCredentialOptions
+            {
+                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
+            };
+
+            var clientSecretCredential = new ClientSecretCredential(
+                tenantId, clientId, clientSecret, options);
+
+            var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
+
+
+            Group group = new Group();
+
+            group.GetType().GetProperty(Property).SetValue(group, Value);
+
+            await graphClient.Groups[GroupId]
+                .Request()
+                .UpdateAsync(group);
+
+            responseMessage = "Group modified successfully.";
+            log.LogInformation("UpdateGroupProperty function processing finished.");
+            return new OkObjectResult(responseMessage);
+        }
+    }
+
+
+
+   
+
 
 }

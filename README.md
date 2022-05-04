@@ -36,6 +36,11 @@ The following Functions are provided:
 	- **UserPrincipalName (Mandatory)** - This will be the Identity (using UserPrincipalName) of the user you want to add to the group.
 	- **GroupId (Mandatory)** - This will be the GroupId of the group where the user will be added.
 
+- **UpdateGroupProperty**: Modify an Azure AD user attribute
+	- **GroupId (Mandatory)** - This will be the GroupId of the group you want to modify.
+	- **Property (Mandatory)** - This will be the Property (Attribute) of the user that will be modified.
+	- **Value (Mandatory)** - This will be the Value of Property that will be modified.
+
 ## Setup & Prerequisites
 Using the steps below you will be able to create all prerequisites and resources required by the solution.
 
@@ -90,6 +95,12 @@ Follow these steps to create the app registration:
 
 ### Deploy Azure Functions
 Deploy Azure Functions for example using Visual Studio.
+
+
+## Usage
+Once deployed to Azure Functions you can execute the funcionts with the following example link:
+
+https://<functionsurl>.azurewebsites.net/api/DeleteUser?code=<Your Function Auth Code>&UserPrincipalName=<UserPrincipalName you want to delete>
 
 
 ## Contributing
