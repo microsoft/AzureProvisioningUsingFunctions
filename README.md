@@ -100,7 +100,7 @@ Deploy Azure Functions for example using Visual Studio.
 ## Usage
 Once deployed to Azure Functions you can execute the funcionts with the following example link:
 
-https://<functionsurl>.azurewebsites.net/api/DeleteUser?code=<Your Function Auth Code>&UserPrincipalName=<UserPrincipalName you want to delete>
+https://yourfunctionsurl.azurewebsites.net/api/DeleteUser?code=Your-Function-Auth-Code&UserPrincipalName=UserPrincipalName-you-want-to-delete
 
 
 ## Contributing
