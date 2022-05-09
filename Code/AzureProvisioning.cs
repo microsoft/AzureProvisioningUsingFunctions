@@ -586,9 +586,84 @@ namespace AzureProvisioning.Code
         }
     }
 
+    public static class CreateGuestUser
+    {
+        [FunctionName("CreateGuestUser")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+            log.LogInformation("CreateGuestUser function triggered with HTTP trigger.");
+
+            string InvitedUserEmailAddress = req.Query["InvitedUserEmailAddress"];
+            string SendInvitationMessage = req.Query["SendInvitationMessage"];
+
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            dynamic data = JsonConvert.DeserializeObject(requestBody);
+            InvitedUserEmailAddress = InvitedUserEmailAddress ?? data?.InvitedUserEmailAddress;
+            SendInvitationMessage = SendInvitationMessage ?? data?.SendInvitationMessage;
+
+            string responseMessage;
+            if (InvitedUserEmailAddress.IsNullOrEmpty())
+            {
+                responseMessage = "Missing Parameter.";
+                return new BadRequestObjectResult(responseMessage);
+            }
+
+            var scopes = new[] { "https://graph.microsoft.com/.default" };
+
+            var builder = new ConfigurationBuilder()
+                    .SetBasePath(Environment.CurrentDirectory)
+                    .AddJsonFile("local.settings.json", true)
+                    .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+                    .AddEnvironmentVariables()
+                    .Build();
 
 
-   
+            var tenantId = builder.GetValue<string>("_secret:tenantId");
+            var clientId = builder.GetValue<string>("_secret:clientId");
+            var clientSecret = builder.GetValue<string>("_secret:clientSecret");
+
+            // using Azure.Identity;
+            var options = new TokenCredentialOptions
+            {
+                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
+            };
+
+            var clientSecretCredential = new ClientSecretCredential(
+                tenantId, clientId, clientSecret, options);
+
+            var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
+
+
+            Invitation invitation = new Invitation();
+
+            if (SendInvitationMessage == "FALSE") { 
+                invitation.SendInvitationMessage = false;
+                invitation.InvitedUserEmailAddress = InvitedUserEmailAddress;
+                invitation.InviteRedirectUrl = "https://teams.microsoft.com";
+            
+            } else
+            {
+                invitation.SendInvitationMessage = true;
+                invitation.InvitedUserEmailAddress = InvitedUserEmailAddress;
+                invitation.InviteRedirectUrl = "https://teams.microsoft.com";
+            }
+           
+
+            await graphClient.Invitations.Request().AddAsync(invitation);
+
+
+            responseMessage = "Guest User created successfully.";
+
+
+            log.LogInformation("CreateGuestUser function processing finished.");
+            return new OkObjectResult(responseMessage);
+
+        }
+    }
+
+
 
 
 }

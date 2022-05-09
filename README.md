@@ -36,10 +36,16 @@ The following Functions are provided:
 	- **UserPrincipalName (Mandatory)** - This will be the Identity (using UserPrincipalName) of the user you want to add to the group.
 	- **GroupId (Mandatory)** - This will be the GroupId of the group where the user will be added.
 
-- **UpdateGroupProperty**: Modify an Azure AD user attribute
+- **UpdateGroupProperty**: Modify an Azure AD group attribute
 	- **GroupId (Mandatory)** - This will be the GroupId of the group you want to modify.
 	- **Property (Mandatory)** - This will be the Property (Attribute) of the user that will be modified.
 	- **Value (Mandatory)** - This will be the Value of Property that will be modified.
+
+	
+- **CreateGuestUser**: Create a guest user in Azure AD 
+	- **InvitedUserEmailAddress (Mandatory)** - This will be the email address address of the user you want to add to you Azure AD as Guest user.
+	- **SendInvitationMessage (Optional)** - It can be TRUE or FALSE and let you decide if you want to send or not invitation message to guest user. Default is TRUE.
+	
 
 ## Setup & Prerequisites
 Using the steps below you will be able to create all prerequisites and resources required by the solution.
