@@ -45,6 +45,13 @@ The following Functions are provided:
 - **CreateGuestUser**: Create a guest user in Azure AD 
 	- **InvitedUserEmailAddress (Mandatory)** - This will be the email address address of the user you want to add to you Azure AD as Guest user.
 	- **SendInvitationMessage (Optional)** - It can be TRUE or FALSE and let you decide if you want to send or not invitation message to guest user. Default is TRUE.
+
+
+- **DownloadTeamsChat**: Download all user, identified by the UserPrincipalName, Teams chats in JSON format. WARNING: This is a Teams protected API (see https://docs.microsoft.com/en-us/graph/teams-protected-apis). The function takes the following parameter:
+	- **UserPrincipalName (Mandatory)** - This will be the Identity (using UserPrincipalName) of the user you want to export Teams chats.
+	- **DownloadFormat (Optional)** - This will be format of the chat export (future use). Right now only the JSON format is supported.
+
+	
 	
 
 ## Setup & Prerequisites
@@ -75,7 +82,7 @@ Follow these steps to create the app registration:
 ### Authorize app access to Azure Active Directory
 
 	1. From the created app, select from left menu of the app created API Authorization.
-	2. Add Graph Authorization: User.ReadWrite.All, LicenseAssignment.ReadWrite.All, Group.ReadWrite.All, Group.Create
+	2. Add Graph Authorization: User.ReadWrite.All, LicenseAssignment.ReadWrite.All, Group.ReadWrite.All, Group.Create, Chat.Read.All
 	3. Provide Admin consent for the authorizations
 
 

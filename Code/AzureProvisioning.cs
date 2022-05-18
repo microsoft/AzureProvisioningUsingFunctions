@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration.UserSecrets;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace AzureProvisioning.Code
 {
@@ -664,6 +665,84 @@ namespace AzureProvisioning.Code
     }
 
 
+    public static class DownloadTeamsChat
+    {
+        [FunctionName("DownloadTeamsChat")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+            log.LogInformation("DownloadTeamsChat function triggered with HTTP trigger.");
 
+            
+            string UserPrincipalName = req.Query["UserPrincipalName"];
+            string DownloadFormat = req.Query["DownloadFormat"];
+
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            dynamic data = JsonConvert.DeserializeObject(requestBody);
+            
+            UserPrincipalName = UserPrincipalName ?? data?.UserPrincipalName;
+            DownloadFormat = DownloadFormat ?? data?.DownloadFormat;
+
+            string responseMessage;
+            if (UserPrincipalName.IsNullOrEmpty())
+            {
+                responseMessage = "Missing Parameter.";
+                return new BadRequestObjectResult(responseMessage);
+            }
+
+           
+            var scopes = new[] { "https://graph.microsoft.com/.default" };
+
+            var builder = new ConfigurationBuilder()
+                    .SetBasePath(Environment.CurrentDirectory)
+                    .AddJsonFile("local.settings.json", true)
+                    .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+                    .AddEnvironmentVariables()
+                    .Build();
+
+
+            var tenantId = builder.GetValue<string>("_secret:tenantId");
+            var clientId = builder.GetValue<string>("_secret:clientId");
+            var clientSecret = builder.GetValue<string>("_secret:clientSecret");
+
+            // using Azure.Identity;
+            var options = new TokenCredentialOptions
+            {
+                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
+            };
+
+            var clientSecretCredential = new ClientSecretCredential(
+                tenantId, clientId, clientSecret, options);
+
+            var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
+
+
+            var getAllMessages = await graphClient.Users[UserPrincipalName].Chats
+                                .GetAllMessages()
+                                .Request()
+                                .GetAsync();
+
+
+
+            
+            string json = JsonConvert.SerializeObject(getAllMessages);
+
+            byte[] jsonConv = Encoding.UTF8.GetBytes(json);
+
+            log.LogInformation("DownloadTeamsChat function processing finished. Sending file to client.");
+
+            string ExportDate = DateTime.Now.ToString("yyyyddMMHHMM");
+            string filename = UserPrincipalName.Replace("@", "_") +"TeamsChatExport_"+ ExportDate+".json";
+
+            return new FileContentResult(jsonConv, "application/octet-stream")
+            {
+                FileDownloadName = filename
+            };
+
+
+
+        }
+    }
 
 }
