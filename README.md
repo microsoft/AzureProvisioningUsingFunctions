@@ -52,7 +52,26 @@ The following Functions are provided:
 	- **DownloadFormat (Optional)** - This will be format of the chat export (future use). Right now only the JSON format is supported.
 
 	
+- **GetUserSignInInfoSuccess**: Gets available user's, identified by the UserPrincipalName, succeded sign-in information (interactive only). The function takes the following parameter:
+	- **UserPrincipalName (Mandatory)** - This will be the Identity (using UserPrincipalName) of the user you want to export sign-in information.
+	- **DownloadFormat (Optional)** - This will be format of the export (future use). Right now only the JSON format is supported (default).
+
 	
+- **GetUserSignInInfoFailure**: Gets available user's, identified by the UserPrincipalName, failed sign-in information (interactive only). The function takes the following parameter:
+	- **UserPrincipalName (Mandatory)** - This will be the Identity (using UserPrincipalName) of the user you want to export sign-in information.
+	- **DownloadFormat (Optional)** - This will be format of the export (future use). Right now only the JSON format is supported (default).
+
+- **GetUserSignInInfo**: Gets available user's, identified by the UserPrincipalName, sign-in information (interactive only). The function takes the following parameter:
+	- **UserPrincipalName (Mandatory)** - This will be the Identity (using UserPrincipalName) of the user you want to export sign-in information.
+	- **DownloadFormat (Optional)** - This will be format of the export (future use). Right now only the JSON format is supported (default).
+
+
+- **GetUserEarliestSignInByResource**: Gets earliest available user's, identified by the UserPrincipalName, succeded sign-in information (interactive only). The function takes the following parameter:
+	- **UserPrincipalName (Mandatory)** - This will be the Identity (using UserPrincipalName) of the user you want to export sign-in information.
+	- **DownloadFormat (Optional)** - This will be format of the export (future use). Right now only the JSON format is supported. If not specified, a CSV format is returned in the response.
+
+
+
 
 ## Setup & Prerequisites
 Using the steps below you will be able to create all prerequisites and resources required by the solution.

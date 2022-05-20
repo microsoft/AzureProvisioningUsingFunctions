@@ -97,10 +97,12 @@ namespace AzureProvisioning.Code
                 .Request()
                 .AddAsync(user);
 
-            if (InitialPassword.IsNullOrEmpty()) {
+            if (InitialPassword.IsNullOrEmpty())
+            {
                 responseMessage = "User created successfully. Generated password is: " + InitialPassword;
             }
-            else { 
+            else
+            {
                 responseMessage = "User created successfully.";
             }
 
@@ -117,7 +119,7 @@ namespace AzureProvisioning.Code
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            
+
             log.LogInformation("UpdateUserProperty function triggered with HTTP trigger.");
 
             string Identity = req.Query["Identity"];
@@ -185,7 +187,7 @@ namespace AzureProvisioning.Code
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            
+
             log.LogInformation("DeleteUser function triggered with HTTP trigger.");
 
             string UserPrincipalName = req.Query["UserPrincipalName"];
@@ -293,7 +295,7 @@ namespace AzureProvisioning.Code
 
             User userToAdd = await graphClient.Users[UserPrincipalName].Request().GetAsync();
             await graphClient.Groups[GroupId].Members.References.Request().AddAsync(userToAdd);
-            
+
 
             responseMessage = "User added to the group successfully.";
 
@@ -310,7 +312,7 @@ namespace AzureProvisioning.Code
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            
+
             log.LogInformation("RemoveUserFromGroup function triggered with HTTP trigger.");
 
             string UserPrincipalName = req.Query["UserPrincipalName"];
@@ -356,7 +358,7 @@ namespace AzureProvisioning.Code
 
 
             User userToAdd = await graphClient.Users[UserPrincipalName].Request().GetAsync();
-            
+
             await graphClient.Groups[GroupId].Members[userToAdd.Id].Reference
                 .Request()
                 .DeleteAsync();
@@ -465,42 +467,42 @@ namespace AzureProvisioning.Code
                         SecurityEnabled = true
                     };
                     break;
-/*
-                case "MailEnabledSecurity": //NOK
-                    group = new Group
-                    {
-                        DisplayName = DisplayName,
-                        MailEnabled = true,
-                        MailNickname = MailNickname,
-                        SecurityEnabled = true
-                    };
-                    break;
+                /*
+                                case "MailEnabledSecurity": //NOK
+                                    group = new Group
+                                    {
+                                        DisplayName = DisplayName,
+                                        MailEnabled = true,
+                                        MailNickname = MailNickname,
+                                        SecurityEnabled = true
+                                    };
+                                    break;
 
-                case "Distribution": //NOK
-                    group = new Group
-                    {
-                        DisplayName = DisplayName,
-                        MailEnabled = true,
-                        MailNickname = MailNickname,
-                        SecurityEnabled = false
-                    };
-                    break;
+                                case "Distribution": //NOK
+                                    group = new Group
+                                    {
+                                        DisplayName = DisplayName,
+                                        MailEnabled = true,
+                                        MailNickname = MailNickname,
+                                        SecurityEnabled = false
+                                    };
+                                    break;
 
-                case "DynamicUnified": //NOK missing membershipRule
-                    group = new Group
-                    {
-                        DisplayName = DisplayName,
-                        GroupTypes = new List<String>()
-                        {
-                            "Unified",
-                            "DynamicMembership"
-                        },
-                        MailEnabled = true,
-                        MailNickname = MailNickname,
-                        SecurityEnabled = false
-                    };
-                    break;
-*/
+                                case "DynamicUnified": //NOK missing membershipRule
+                                    group = new Group
+                                    {
+                                        DisplayName = DisplayName,
+                                        GroupTypes = new List<String>()
+                                        {
+                                            "Unified",
+                                            "DynamicMembership"
+                                        },
+                                        MailEnabled = true,
+                                        MailNickname = MailNickname,
+                                        SecurityEnabled = false
+                                    };
+                                    break;
+                */
                 default:
                     responseMessage = "GroupType not supported.";
                     return new BadRequestObjectResult(responseMessage);
@@ -639,18 +641,20 @@ namespace AzureProvisioning.Code
 
             Invitation invitation = new Invitation();
 
-            if (SendInvitationMessage == "FALSE") { 
+            if (SendInvitationMessage == "FALSE")
+            {
                 invitation.SendInvitationMessage = false;
                 invitation.InvitedUserEmailAddress = InvitedUserEmailAddress;
                 invitation.InviteRedirectUrl = "https://teams.microsoft.com";
-            
-            } else
+
+            }
+            else
             {
                 invitation.SendInvitationMessage = true;
                 invitation.InvitedUserEmailAddress = InvitedUserEmailAddress;
                 invitation.InviteRedirectUrl = "https://teams.microsoft.com";
             }
-           
+
 
             await graphClient.Invitations.Request().AddAsync(invitation);
 
@@ -674,13 +678,13 @@ namespace AzureProvisioning.Code
         {
             log.LogInformation("DownloadTeamsChat function triggered with HTTP trigger.");
 
-            
+
             string UserPrincipalName = req.Query["UserPrincipalName"];
             string DownloadFormat = req.Query["DownloadFormat"];
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
-            
+
             UserPrincipalName = UserPrincipalName ?? data?.UserPrincipalName;
             DownloadFormat = DownloadFormat ?? data?.DownloadFormat;
 
@@ -691,7 +695,7 @@ namespace AzureProvisioning.Code
                 return new BadRequestObjectResult(responseMessage);
             }
 
-           
+
             var scopes = new[] { "https://graph.microsoft.com/.default" };
 
             var builder = new ConfigurationBuilder()
@@ -723,9 +727,6 @@ namespace AzureProvisioning.Code
                                 .Request()
                                 .GetAsync();
 
-
-
-            
             string json = JsonConvert.SerializeObject(getAllMessages);
 
             byte[] jsonConv = Encoding.UTF8.GetBytes(json);
@@ -733,16 +734,329 @@ namespace AzureProvisioning.Code
             log.LogInformation("DownloadTeamsChat function processing finished. Sending file to client.");
 
             string ExportDate = DateTime.Now.ToString("yyyyddMMHHMM");
-            string filename = UserPrincipalName.Replace("@", "_") +"TeamsChatExport_"+ ExportDate+".json";
+            string filename = UserPrincipalName.Replace("@", "_") + "TeamsChatExport_" + ExportDate + ".json";
+
+            return new FileContentResult(jsonConv, "application/octet-stream")
+            {
+                FileDownloadName = filename
+            };
+        }
+
+    }
+
+
+    public static class GetUserSignInInfoSuccess
+    {
+        [FunctionName("GetUserSignInInfoSuccess")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+            log.LogInformation("GetUserSignInInfoSuccess function triggered with HTTP trigger.");
+
+            string UserPrincipalName = req.Query["UserPrincipalName"];
+            string DownloadFormat = req.Query["DownloadFormat"];
+            
+
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            dynamic data = JsonConvert.DeserializeObject(requestBody);
+
+            UserPrincipalName = UserPrincipalName ?? data?.UserPrincipalName;
+            DownloadFormat = DownloadFormat ?? data?.DownloadFormat;
+
+            string responseMessage;
+            if (UserPrincipalName.IsNullOrEmpty())
+            {
+                responseMessage = "Missing Parameter.";
+                return new BadRequestObjectResult(responseMessage);
+            }
+
+            var scopes = new[] { "https://graph.microsoft.com/.default" };
+
+            var builder = new ConfigurationBuilder()
+                    .SetBasePath(Environment.CurrentDirectory)
+                    .AddJsonFile("local.settings.json", true)
+                    .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+                    .AddEnvironmentVariables()
+                    .Build();
+
+
+            var tenantId = builder.GetValue<string>("_secret:tenantId");
+            var clientId = builder.GetValue<string>("_secret:clientId");
+            var clientSecret = builder.GetValue<string>("_secret:clientSecret");
+
+            // using Azure.Identity;
+            var options = new TokenCredentialOptions
+            {
+                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
+            };
+
+            var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret, options);
+
+            var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
+
+            var signIns = await graphClient
+                .AuditLogs
+                .SignIns
+                .Request().Filter($"UserPrincipalName eq '{UserPrincipalName}' and IsInteractive eq true and status/errorCode eq 0").OrderBy("CreatedDateTime")
+                .GetAsync();
+
+            string json = JsonConvert.SerializeObject(signIns);
+
+            byte[] jsonConv = Encoding.UTF8.GetBytes(json);
+
+            string ExportDate = DateTime.Now.ToString("yyyyddMMHHMM");
+            string filename = UserPrincipalName.Replace("@", "_") + "UserSignInInfoSuccess" + ExportDate + ".json";
+
+
+            log.LogInformation("GetUserSignInInfoSuccess function processing finished.");
 
             return new FileContentResult(jsonConv, "application/octet-stream")
             {
                 FileDownloadName = filename
             };
 
+        }
+    }
 
+
+    public static class GetUserSignInInfoFailure
+    {
+        [FunctionName("GetUserSignInInfoFailure")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+            log.LogInformation("GetUserSignInInfoFailure function triggered with HTTP trigger.");
+
+            string UserPrincipalName = req.Query["UserPrincipalName"];
+            string DownloadFormat = req.Query["DownloadFormat"];
+
+
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            dynamic data = JsonConvert.DeserializeObject(requestBody);
+
+            UserPrincipalName = UserPrincipalName ?? data?.UserPrincipalName;
+            DownloadFormat = DownloadFormat ?? data?.DownloadFormat;
+
+            string responseMessage;
+            if (UserPrincipalName.IsNullOrEmpty())
+            {
+                responseMessage = "Missing Parameter.";
+                return new BadRequestObjectResult(responseMessage);
+            }
+
+            var scopes = new[] { "https://graph.microsoft.com/.default" };
+
+            var builder = new ConfigurationBuilder()
+                    .SetBasePath(Environment.CurrentDirectory)
+                    .AddJsonFile("local.settings.json", true)
+                    .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+                    .AddEnvironmentVariables()
+                    .Build();
+
+
+            var tenantId = builder.GetValue<string>("_secret:tenantId");
+            var clientId = builder.GetValue<string>("_secret:clientId");
+            var clientSecret = builder.GetValue<string>("_secret:clientSecret");
+
+            // using Azure.Identity;
+            var options = new TokenCredentialOptions
+            {
+                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
+            };
+
+            var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret, options);
+
+            var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
+
+            var signIns = await graphClient
+                .AuditLogs
+                .SignIns
+                .Request().Filter($"UserPrincipalName eq '{UserPrincipalName}' and IsInteractive eq true and status/errorCode ne 0").OrderBy("CreatedDateTime")
+                .GetAsync();
+
+            string json = JsonConvert.SerializeObject(signIns);
+
+            byte[] jsonConv = Encoding.UTF8.GetBytes(json);
+
+            string ExportDate = DateTime.Now.ToString("yyyyddMMHHMM");
+            string filename = UserPrincipalName.Replace("@", "_") + "UserSignInInfoFailure" + ExportDate + ".json";
+
+
+            log.LogInformation("GetUserSignInInfoFailure function processing finished.");
+
+            return new FileContentResult(jsonConv, "application/octet-stream")
+            {
+                FileDownloadName = filename
+            };
 
         }
     }
 
+
+    public static class GetUserSignInInfo
+    {
+        [FunctionName("GetUserSignInInfo")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+            log.LogInformation("GetUserSignInInfo function triggered with HTTP trigger.");
+
+            string UserPrincipalName = req.Query["UserPrincipalName"];
+            string DownloadFormat = req.Query["DownloadFormat"];
+
+
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            dynamic data = JsonConvert.DeserializeObject(requestBody);
+
+            UserPrincipalName = UserPrincipalName ?? data?.UserPrincipalName;
+            DownloadFormat = DownloadFormat ?? data?.DownloadFormat;
+
+            string responseMessage;
+            if (UserPrincipalName.IsNullOrEmpty())
+            {
+                responseMessage = "Missing Parameter.";
+                return new BadRequestObjectResult(responseMessage);
+            }
+
+            var scopes = new[] { "https://graph.microsoft.com/.default" };
+
+            var builder = new ConfigurationBuilder()
+                    .SetBasePath(Environment.CurrentDirectory)
+                    .AddJsonFile("local.settings.json", true)
+                    .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+                    .AddEnvironmentVariables()
+                    .Build();
+
+
+            var tenantId = builder.GetValue<string>("_secret:tenantId");
+            var clientId = builder.GetValue<string>("_secret:clientId");
+            var clientSecret = builder.GetValue<string>("_secret:clientSecret");
+
+            // using Azure.Identity;
+            var options = new TokenCredentialOptions
+            {
+                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
+            };
+
+            var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret, options);
+
+            var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
+
+            var signIns = await graphClient
+                .AuditLogs
+                .SignIns
+                .Request().Filter($"UserPrincipalName eq '{UserPrincipalName}' and IsInteractive eq true").OrderBy("CreatedDateTime")
+                .GetAsync();
+
+            string json = JsonConvert.SerializeObject(signIns);
+
+            byte[] jsonConv = Encoding.UTF8.GetBytes(json);
+
+            string ExportDate = DateTime.Now.ToString("yyyyddMMHHMM");
+            string filename = UserPrincipalName.Replace("@", "_") + "UserSignInInfoFailure" + ExportDate + ".json";
+
+
+            log.LogInformation("GetUserSignInInfo function processing finished.");
+
+            return new FileContentResult(jsonConv, "application/octet-stream")
+            {
+                FileDownloadName = filename
+            };
+
+        }
+    }
+
+
+    public static class GetUserEarliestSignInByResource
+    {
+        [FunctionName("GetUserEarliestSignInByResource")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+            log.LogInformation("GetUserEarliestSignInByResource function triggered with HTTP trigger.");
+
+            string UserPrincipalName = req.Query["UserPrincipalName"];
+            string DownloadFormat = req.Query["DownloadFormat"];
+
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            dynamic data = JsonConvert.DeserializeObject(requestBody);
+
+            UserPrincipalName = UserPrincipalName ?? data?.UserPrincipalName;
+            DownloadFormat = DownloadFormat ?? data?.DownloadFormat;
+
+            string responseMessage="";
+            if (UserPrincipalName.IsNullOrEmpty())
+            {
+                responseMessage = "Missing Parameter.";
+                return new BadRequestObjectResult(responseMessage);
+            }
+
+            var scopes = new[] { "https://graph.microsoft.com/.default" };
+
+            var builder = new ConfigurationBuilder()
+                    .SetBasePath(Environment.CurrentDirectory)
+                    .AddJsonFile("local.settings.json", true)
+                    .AddUserSecrets(Assembly.GetExecutingAssembly(), true)
+                    .AddEnvironmentVariables()
+                    .Build();
+
+
+            var tenantId = builder.GetValue<string>("_secret:tenantId");
+            var clientId = builder.GetValue<string>("_secret:clientId");
+            var clientSecret = builder.GetValue<string>("_secret:clientSecret");
+
+            // using Azure.Identity;
+            var options = new TokenCredentialOptions
+            {
+                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
+            };
+
+            var clientSecretCredential = new ClientSecretCredential(tenantId, clientId, clientSecret, options);
+
+            var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
+
+            var signIns = await graphClient
+                .AuditLogs
+                .SignIns
+                .Request().Filter($"UserPrincipalName eq '{UserPrincipalName}' and IsInteractive eq true and status/errorCode eq 0").OrderBy("CreatedDateTime")
+                .GetAsync();
+
+            var signInsD = signIns.Distinct();
+
+
+
+            log.LogInformation("GetUserEarliestSignInByResource function processing finished.");
+
+            if (DownloadFormat == "JSON")
+            {
+
+                string json = JsonConvert.SerializeObject(signInsD);
+                byte[] jsonConv = Encoding.UTF8.GetBytes(json);
+
+                string ExportDate = DateTime.Now.ToString("yyyyddMMHHMM");
+                string filename = UserPrincipalName.Replace("@", "_") + "EarliestSignInByResource_" + ExportDate + ".json";
+                return new FileContentResult(jsonConv, "application/octet-stream")
+                {
+                    FileDownloadName = filename
+                };
+            }
+            else
+            {
+                foreach (var entry in signInsD)
+                {
+                    responseMessage += UserPrincipalName + "," + entry.CreatedDateTime + "," + entry.ClientAppUsed + "," + entry.ResourceDisplayName + "," + entry.AppDisplayName + Environment.NewLine;
+                }
+                return new OkObjectResult(responseMessage);
+            }
+
+        }
+
+    }
+
+
+    
 }
