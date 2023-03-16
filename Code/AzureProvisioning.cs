@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Graph.Models;
 
 namespace AzureProvisioning.Code
 {
@@ -94,8 +95,7 @@ namespace AzureProvisioning.Code
 
 
             await graphClient.Users
-                .Request()
-                .AddAsync(user);
+                .PostAsync(user);
 
             if (InitialPassword.IsNullOrEmpty())
             {
@@ -105,6 +105,7 @@ namespace AzureProvisioning.Code
             {
                 responseMessage = "User created successfully.";
             }
+
 
             log.LogInformation("CreateUser function processing finished.");
             return new OkObjectResult(responseMessage);
@@ -171,8 +172,7 @@ namespace AzureProvisioning.Code
             user.GetType().GetProperty(Property).SetValue(user, Value);
 
             await graphClient.Users[Identity]
-                .Request()
-                .UpdateAsync(user);
+                .PatchAsync(user);
 
             responseMessage = "User modified successfully.";
             log.LogInformation("UpdateUserProperty function processing finished.");
@@ -232,7 +232,6 @@ namespace AzureProvisioning.Code
 
 
             await graphClient.Users[UserPrincipalName]
-                .Request()
                 .DeleteAsync();
 
             responseMessage = "User deleted successfully.";
@@ -293,8 +292,8 @@ namespace AzureProvisioning.Code
             var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
 
 
-            User userToAdd = await graphClient.Users[UserPrincipalName].Request().GetAsync();
-            await graphClient.Groups[GroupId].Members.References.Request().AddAsync(userToAdd);
+            User userToAdd = await graphClient.Users[UserPrincipalName].GetAsync();
+            await graphClient.Groups[GroupId].Members.(userToAdd);
 
 
             responseMessage = "User added to the group successfully.";
@@ -357,10 +356,9 @@ namespace AzureProvisioning.Code
             var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
 
 
-            User userToAdd = await graphClient.Users[UserPrincipalName].Request().GetAsync();
+            User userToAdd = await graphClient.Users[UserPrincipalName].GetAsync();
 
-            await graphClient.Groups[GroupId].Members[userToAdd.Id].Reference
-                .Request()
+            await graphClient.Groups[GroupId].Members[userToAdd.Id].Ref
                 .DeleteAsync();
 
 
@@ -510,8 +508,7 @@ namespace AzureProvisioning.Code
             }
 
             await graphClient.Groups
-                .Request()
-                .AddAsync(group);
+                .PostAsync(group);
 
             responseMessage = "Group created successfully.";
 
@@ -580,8 +577,7 @@ namespace AzureProvisioning.Code
             group.GetType().GetProperty(Property).SetValue(group, Value);
 
             await graphClient.Groups[GroupId]
-                .Request()
-                .UpdateAsync(group);
+                .PatchAsync(group);
 
             responseMessage = "Group modified successfully.";
             log.LogInformation("UpdateGroupProperty function processing finished.");
@@ -656,7 +652,7 @@ namespace AzureProvisioning.Code
             }
 
 
-            await graphClient.Invitations.Request().AddAsync(invitation);
+            await graphClient.Invitations.PostAsync(invitation);
 
 
             responseMessage = "Guest User created successfully.";
@@ -723,9 +719,8 @@ namespace AzureProvisioning.Code
 
 
             var getAllMessages = await graphClient.Users[UserPrincipalName].Chats
-                                .GetAllMessages()
-                                .Request()
-                                .GetAsync();
+                .GetAllMessages()
+                .GetAsync();
 
             string json = JsonConvert.SerializeObject(getAllMessages);
 
@@ -798,7 +793,7 @@ namespace AzureProvisioning.Code
             var signIns = await graphClient
                 .AuditLogs
                 .SignIns
-                .Request().Filter($"UserPrincipalName eq '{UserPrincipalName}' and IsInteractive eq true and status/errorCode eq 0").OrderBy("CreatedDateTime")
+                .Filter($"UserPrincipalName eq '{UserPrincipalName}' and IsInteractive eq true and status/errorCode eq 0").OrderBy("CreatedDateTime")
                 .GetAsync();
 
             string json = JsonConvert.SerializeObject(signIns);
@@ -948,7 +943,7 @@ namespace AzureProvisioning.Code
             var signIns = await graphClient
                 .AuditLogs
                 .SignIns
-                .Request().Filter($"UserPrincipalName eq '{UserPrincipalName}' and IsInteractive eq true").OrderBy("CreatedDateTime")
+                .Filter($"UserPrincipalName eq '{UserPrincipalName}' and IsInteractive eq true").OrderBy("CreatedDateTime")
                 .GetAsync();
 
             string json = JsonConvert.SerializeObject(signIns);
