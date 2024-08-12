@@ -19,7 +19,7 @@ The following Functions are provided:
 	- **Property (Mandatory)** - This will be the Property (Attribute) of the user that will be modified.
 	- **Value (Mandatory)** - This will be the Value of Property that will be modified.
 
-- **DeleteUser**: Delete a Azure AD user identified by the UserPrincipalName. The function takes the following parameter:
+- **DeleteUser**: Delete an Azure AD user identified by the UserPrincipalName. The function takes the following parameter:
 	- **UserPrincipalName (Mandatory)** - This will be the Identity (using UserPrincipalName) of the user you want to delete.
 
 - **CreateGroup**: Create an Azure AD group of specified type. The function takes the following parameter:
